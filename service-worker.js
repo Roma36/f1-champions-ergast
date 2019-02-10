@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/f1-champions-ergast/precache-manifest.b00a842d4229d96788ebe783e2370e8a.js"
+  "/f1-champions-ergast/precache-manifest.8803f6fa4c2dd560ee97c6e33fdef57d.js"
 );
 
 workbox.clientsClaim();
