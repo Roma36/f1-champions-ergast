@@ -1,0 +1,19 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-standard", "tslint-react", "tslint-config-prettier"],
+  "defaultSeverity": "error",
+  "jsRules": {},
+  "rules": {
+    "ordered-imports": false,
+    "object-literal-sort-keys": false,
+    "member-access": false,
+    "member-ordering": [
+      true,
+      {
+        "order": ["static-field", "instance-field", "static-method", "instance-method"]
+      }
+    ],
+    "jsx-boolean-value": false,
+    "interface-name": false
+  },
+  "rulesDirectory": []
+}
