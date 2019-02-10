@@ -1,16 +1,26 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../config';
+import { DriverInfo } from '../models';
+import WinnersList from './WinnersList';
+import styled from 'styled-components';
+
+const ToggleableWinnersList = styled(WinnersList)`
+  ${(props: { isDisplayed: boolean }) => `
+    display: ${props.isDisplayed ? '' : 'none'}
+  `}
+`;
 
 interface StandingsInfo {
   season: string;
   DriverStandings: Array<{
-    Driver: {
-      driverId: string;
-      givenName: string;
-      familyName: string;
-    };
+    Driver: DriverInfo;
   }>;
+}
+
+interface SublistState {
+  isDisplayed: boolean;
+  isLoaded: boolean;
 }
 
 function ChampionsList() {
@@ -20,14 +30,20 @@ function ChampionsList() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const [sublistState, setSublistState] = useState<{ [season: string]: SublistState }>({});
+
   const fetchData = async () => {
     setIsError(false);
     setIsLoading(true);
 
     try {
       const result = await axios(url);
-
-      setStandingsList(result.data.MRData.StandingsTable.StandingsLists);
+      const standings: StandingsInfo[] = result.data.MRData.StandingsTable.StandingsLists;
+      setStandingsList(standings);
+      setSublistState(
+        // prefill sublist state;
+        standings.reduce((acc, current) => ({ ...acc, [current.season]: { isDisplayed: false, isLoaded: false } }), {})
+      );
     } catch (error) {
       setIsError(true);
     }
@@ -39,6 +55,16 @@ function ChampionsList() {
     fetchData();
   }, [url]);
 
+  const handleRowClick = (season: string) => {
+    setSublistState({
+      ...sublistState,
+      [season]: {
+        isLoaded: true,
+        isDisplayed: !sublistState[season].isDisplayed,
+      },
+    });
+  };
+
   return (
     <Fragment>
       {isError && <div>Something went wrong ...</div>}
@@ -48,8 +74,23 @@ function ChampionsList() {
       ) : (
         <ul>
           {standingsList.map(item => {
-            const key = `${item.season} - ${item.DriverStandings[0].Driver.driverId}`;
-            return <li key={key}>{key}</li>;
+            const champSeason = item.season;
+            const seasonState = sublistState[champSeason];
+            const driverId = item.DriverStandings[0].Driver.driverId;
+
+            const key = `${champSeason} - ${driverId}`;
+            return (
+              <li onClick={handleRowClick.bind(null, champSeason)} key={key}>
+                {key}
+                {seasonState.isLoaded && (
+                  <ToggleableWinnersList
+                    isDisplayed={seasonState.isDisplayed}
+                    season={champSeason}
+                    championId={driverId}
+                  />
+                )}
+              </li>
+            );
           })}
         </ul>
       )}
