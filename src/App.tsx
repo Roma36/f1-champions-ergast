@@ -14,6 +14,7 @@ const Header = styled.header`
 
 const Logo = styled.img`
   width: 120px;
+  margin: 5px 0;
 `;
 
 const ContentWrapper = styled.div`
@@ -25,7 +26,7 @@ class App extends Component {
     return (
       <AppWrapper>
         <Header>
-          <Logo src={config.publicUrl + '/img/f1_logo.svg'} />
+          <Logo src={config.publicUrl + '/img/flags.png'} />
         </Header>
 
         <ContentWrapper>

@@ -4,6 +4,7 @@ import config from '../config';
 import { DriverInfo } from '../models';
 import WinnersList from './WinnersList';
 import styled from 'styled-components';
+import Error from './Error';
 
 const ToggleableWinnersList = styled(WinnersList)`
   ${(props: { isDisplayed: boolean }) => `
@@ -13,20 +14,21 @@ const ToggleableWinnersList = styled(WinnersList)`
 
 const List = styled.ul`
   margin-top: 0;
+  padding: 0;
 `;
 
 const Row = styled.li`
   width: 100%;
-  font-size: 18px;
   min-height: 40px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
   margin-bottom: 10px;
 
   & > span {
+    font-weight: bold;
+    font-size: 20px;
     padding: 10px 5px;
-
+    cursor: pointer;
     &:hover {
       background: #000;
       color: #fff;
@@ -96,13 +98,12 @@ function ChampionsList() {
     });
   };
 
+  if (isError) return <Error>Something went wrong ...</Error>;
+
   return (
     <Fragment>
-      {isError && <div>Something went wrong ...</div>}
-
-      {isLoading ? (
-        <div>Loading ...</div>
-      ) : (
+      {isLoading && <div>Loading ...</div>}
+      {!isLoading && !isError && Boolean(standingsList.length) && (
         <List>
           {standingsList.map(item => {
             const champSeason = item.season;
@@ -115,9 +116,15 @@ function ChampionsList() {
                 <span onClick={handleRowClick.bind(null, champSeason)}>{`${champSeason} - ${driver.givenName} ${
                   driver.familyName
                 }`}</span>
-                {seasonState.isLoaded && (
-                  <ToggleableWinnersList isDisplayed={seasonState.isDisplayed} season={champSeason} champion={driver} />
-                )}
+                <div>
+                  {seasonState.isLoaded && (
+                    <ToggleableWinnersList
+                      isDisplayed={seasonState.isDisplayed}
+                      season={champSeason}
+                      champion={driver}
+                    />
+                  )}
+                </div>
               </Row>
             );
           })}

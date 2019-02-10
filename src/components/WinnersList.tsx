@@ -1,8 +1,13 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../config';
 import { DriverInfo } from '../models';
 import styled from 'styled-components';
+import Error from './Error';
+
+const WinnersListWrapper = styled.div`
+  overflow: auto;
+`;
 
 const Table = styled.table`
   border-collapse: collapse;
@@ -22,12 +27,9 @@ const Table = styled.table`
   }
 `;
 
-const WinnersListWrapper = styled.div`
-  padding-left: 20px;
-`;
-
 const Row = styled.tr`
   & > td {
+    min-width: 80px;
     font-size: 13px;
     text-align: left;
     padding: 18px 20px 14px;
@@ -37,10 +39,13 @@ const Row = styled.tr`
   ${(props: { isChampion: boolean }) =>
     props.isChampion
       ? `
-  background: red;
   & > td {
+    background: red;
     color: #fff;
-  }
+    font-weight: bold;
+    font-size: 1rem;
+    }
+
   `
       : ''}
 `;
@@ -94,45 +99,47 @@ function WinnersList({ season, champion, className }: WinnerListProperties) {
     fetchData();
   }, [url]);
 
+  if (isError) return <Error>Something went wrong ...</Error>;
+
   return (
     <WinnersListWrapper className={className}>
-      {isError && <div>Something went wrong ...</div>}
+      {isLoading && <div>Loading ...</div>}
+      {!isLoading && !isError && Boolean(winnersList.length) && (
+        <div>
+          <Table>
+            <thead>
+              <tr>
+                <th>Grand Prix</th>
+                <th>Date</th>
+                <th>Winner</th>
+                <th>Car</th>
+                <th>Laps</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {winnersList.map(item => {
+                const results = item.Results[0];
+                const driver = results.Driver;
+                const constructor = results.Constructor;
+                const key = `${item.round}-${item.Circuit.Location.country}-${driver.driverId}`;
+                const date = new Date(item.date);
 
-      {isLoading ? (
-        <div>Loading ...</div>
-      ) : (
-        <Table>
-          <thead>
-            <tr>
-              <th>Grand Prix</th>
-              <th>Date</th>
-              <th>Winner</th>
-              <th>Car</th>
-              <th>Laps</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {winnersList.map(item => {
-              const results = item.Results[0];
-              const driver = results.Driver;
-              const constructor = results.Constructor;
-              const key = `${item.Circuit.Location.country} - ${driver.driverId}`;
-              const date = new Date(item.date);
-
-              return (
-                <Row isChampion={driver.driverId === champion.driverId} key={key}>
-                  <td>{item.Circuit.Location.country}</td>
-                  <td>{`${date.toDateString().slice(4)}`}</td>
-                  <td>{`${driver.givenName} ${driver.familyName}`}</td>
-                  <td>{constructor.name}</td>
-                  <td>{results.laps}</td>
-                  <td>{results.Time.time}</td>
-                </Row>
-              );
-            })}
-          </tbody>
-        </Table>
+                return (
+                  <Row isChampion={driver.driverId === champion.driverId} key={key}>
+                    <td>{item.Circuit.Location.country}</td>
+                    <td>{`${date.toDateString().slice(4)}`}</td>
+                    <td>{`${driver.givenName} ${driver.familyName}`}</td>
+                    <td>{constructor.name}</td>
+                    <td>{results.laps}</td>
+                    <td>{results.Time.time}</td>
+                  </Row>
+                );
+              })}
+            </tbody>
+          </Table>
+          <hr style={{ marginTop: '20px', border: '1px dashed gray' }} />
+        </div>
       )}
     </WinnersListWrapper>
   );
