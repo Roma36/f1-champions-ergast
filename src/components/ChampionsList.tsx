@@ -11,6 +11,37 @@ const ToggleableWinnersList = styled(WinnersList)`
   `}
 `;
 
+const List = styled.ul`
+  margin-top: 0;
+`;
+
+const Row = styled.li`
+  width: 100%;
+  font-size: 18px;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  margin-bottom: 10px;
+
+  & > span {
+    padding: 10px 5px;
+
+    &:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    ${(props: { isActive: boolean }) =>
+      props.isActive
+        ? `
+      background: #000;
+      color: #fff;
+    `
+        : ''}
+  }
+`;
+
 interface StandingsInfo {
   season: string;
   DriverStandings: Array<{
@@ -72,27 +103,25 @@ function ChampionsList() {
       {isLoading ? (
         <div>Loading ...</div>
       ) : (
-        <ul>
+        <List>
           {standingsList.map(item => {
             const champSeason = item.season;
             const seasonState = sublistState[champSeason];
-            const driverId = item.DriverStandings[0].Driver.driverId;
+            const driver = item.DriverStandings[0].Driver;
 
-            const key = `${champSeason} - ${driverId}`;
+            const key = `${champSeason} - ${driver.driverId}`;
             return (
-              <li onClick={handleRowClick.bind(null, champSeason)} key={key}>
-                {key}
+              <Row isActive={seasonState.isDisplayed} key={key}>
+                <span onClick={handleRowClick.bind(null, champSeason)}>{`${champSeason} - ${driver.givenName} ${
+                  driver.familyName
+                }`}</span>
                 {seasonState.isLoaded && (
-                  <ToggleableWinnersList
-                    isDisplayed={seasonState.isDisplayed}
-                    season={champSeason}
-                    championId={driverId}
-                  />
+                  <ToggleableWinnersList isDisplayed={seasonState.isDisplayed} season={champSeason} champion={driver} />
                 )}
-              </li>
+              </Row>
             );
           })}
-        </ul>
+        </List>
       )}
     </Fragment>
   );

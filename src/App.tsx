@@ -37,5 +37,3 @@ class App extends Component {
 }
 
 export default App;
-
-// http://ergast.com/api/f1/driverStandings/1.json?limit=11&offset=55
