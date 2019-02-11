@@ -126,7 +126,7 @@ function WinnersList({ season, champion, className }: WinnerListProperties) {
                 const date = new Date(item.date);
 
                 return (
-                  <Row isChampion={driver.driverId === champion.driverId} key={key}>
+                  <Row data-testid="winnerRow" isChampion={driver.driverId === champion.driverId} key={key}>
                     <td>{item.Circuit.Location.country}</td>
                     <td>{`${date.toDateString().slice(4)}`}</td>
                     <td>{`${driver.givenName} ${driver.familyName}`}</td>

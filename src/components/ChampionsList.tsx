@@ -56,10 +56,10 @@ interface SublistState {
   isLoaded: boolean;
 }
 
+const url = `${config.api}f1/driverStandings/1.json?limit=11&offset=55`;
+
 function ChampionsList() {
   const [standingsList, setStandingsList] = useState<StandingsInfo[]>([]);
-  const url = `${config.api}f1/driverStandings/1.json?limit=11&offset=55`;
-
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
